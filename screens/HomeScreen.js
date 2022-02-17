@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView, Image } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, Image, TouchableOpacity } from 'react-native';
 import React from 'react';
 import tw from 'tailwind-react-native-classnames';
 import NavOptions from '../components/NavOptions';
@@ -7,9 +7,21 @@ import { GOOGLE_MAPS_APIKEY } from '@env';
 import { useDispatch } from 'react-redux';
 import { setDestination, setOrigin } from '../slices/navSlice';
 import NavFavorites from '../components/NavFavorites';
+import { auth } from '../Firebase';
+import { useNavigation } from '@react-navigation/native';
 
 const HomeScreen = () => {
   const dispatch = useDispatch();
+  const navigation = useNavigation();
+
+  const handleSignOut = () => {
+    auth
+      .signOut()
+      .then(() => {
+        navigation.replace("LoginScreen");
+      }) 
+      .catch(error => alert(error.message))
+  }
 
   return (
     <SafeAreaView style={tw `bg-gray-300 h-full`}>
@@ -55,6 +67,15 @@ const HomeScreen = () => {
         />
         <NavOptions />
         <NavFavorites />
+      </View>
+      <View style={styles.container}>
+        <Text>Email: {auth.currentUser?.email}</Text>
+        <TouchableOpacity
+          onPress={handleSignOut}
+          style={styles.button}
+        >
+          <Text style={styles.buttonText}>Sign out</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   )
